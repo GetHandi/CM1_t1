@@ -1,33 +1,46 @@
 ﻿// Вариант 4;
+// Решение СЛАУ методом Гаусса;
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 
 using namespace std;
 
-const unsigned char SIZE = 5;
 
-double matrix[SIZE][SIZE + 1] = { {-0.69, -0.04, 0.52, -0.7, 0.53, 0.59},
-								  {-0.22, -0.49, -0.96, 0.95, 0.27, 0.81},
-								  {0.15, 0.55, 0.33, -0.18, 0.14, 0.93},
-								  {0.47, -0.53, 0.0, 0.97, -0.26, 0.52},
-								  {0.4, 0.94, -0.41, -0.04, 0.52, -0.74} };
-
-
-
-void PrintMatrix(double* matrix, const unsigned char SIZE);
+void PrintMatrix(double* ptr[], const unsigned char SIZE_R, const unsigned char SIZE_C)
+{
+	for (int i = 0; i < SIZE_R; i++) {
+		for (int j = 0; j < SIZE_C; j++) {
+			cout << setw(9) << ptr[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
 
 
 int main()
 {
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE + 1; j++) {
-			cout << setw(6) << matrix[i][j];
-		}
-		cout << endl;
-	}
+	const unsigned char SIZE = 5;
+
+	double matrix[][SIZE + 1] = { {-0.69, -0.04, 0.52, -0.7, 0.53, 0.59},
+								{-0.22, -0.49, -0.96, 0.95, 0.27, 0.81},
+								{0.15, 0.55, 0.33, -0.18, 0.14, 0.93},
+								{0.47, -0.53, 0.0, 0.97, -0.26, 0.52},
+								{0.4, 0.94, -0.41, -0.04, 0.52, -0.74} };
+	double result[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+	// создание массива указателей массива matrix
+	double* ptr[SIZE]{};
+	for (int i = 0; i < SIZE; i++)
+		ptr[i] = matrix[i];
+
+
+
+	PrintMatrix(ptr, SIZE, SIZE + 1);
 
 	int m = 0;
+	//прямой ход;
 	for (int k = 0; k < SIZE; k++)
 	{
 		// проверка на 0;
@@ -36,11 +49,13 @@ int main()
 			m = k + 1;
 			while (abs(matrix[m][k] < 0.000001))
 			{
-				m = m + 1;
+				m += 1;
 			}
-			for (int j = 0; j < SIZE; j++)
+			for (int j = 0; j < SIZE+1; j++)
 			{
-
+				double temp_var = matrix[k][j];
+				matrix[k][j] = matrix[m][j];
+				matrix[m][j] = temp_var;
 			}
 		}
 
@@ -67,18 +82,31 @@ int main()
 		}
 
 		// вывод матрицы в консоль;
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE + 1; j++) {
-				cout << setw(9) << matrix[i][j];
-			}
-			cout << endl;
-		}
-		cout << endl;
-
-
-
+		PrintMatrix(ptr, SIZE, SIZE + 1);
+		
 	}
 
+	// обратный ход;
+	for (int k = SIZE-1; k >= 0; k--)
+	{
+		if (k == SIZE-1)
+		{
+			result[k] = matrix[k][k + 1];
+		}
+		else
+		{
+			result[k] = matrix[k][SIZE];
+			for (int j = SIZE-1; j > k; j--)
+			{
+				result[k] -= result[j] * matrix[k][j];
+			}
+		}
+	}
 
+	cout << "Answer:" << endl;
+	for (int i = 0; i < SIZE; i++)
+	{
+		cout << "x" << i+1 << " = " << result[i] << endl;
+	}
 	return 0;
 }
